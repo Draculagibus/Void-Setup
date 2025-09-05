@@ -1,2 +1,2 @@
-# nixos
-My Nixos Configuration
+# Void-Linux
+My Void Configuration
