@@ -37,6 +37,7 @@ packages=(
   discord            # Chat app
   steam              # Game launcher
   swww               # Wallpaper
+  grub-btrfs         # Manage BTRFS snapshots from GRUB
 )
 sudo xbps-install -Sy "${packages[@]}"
 echo "Packages installed successfully!"
@@ -71,3 +72,4 @@ echo "managing user rights..."
 sudo usermod -aG _seatd "$USER"
 
 # Need to check if zzz is installed by default
+
