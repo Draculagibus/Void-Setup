@@ -51,12 +51,23 @@ fc-cache -fv
 rm -rf "$TEMP_DIR"
 echo "Hack Nerd Font installed successfully!"
 
+echo "Make PipeWire run WirePlumber directly..."
+mkdir -p /etc/pipewire/pipewire.conf.d
+ln -s /usr/share/examples/wireplumber/10-wireplumber.conf /etc/pipewire/pipewire.conf.d/
+echo "PipeWireSuccess!"
 
 echo "starting services..."
-dhcpcd
-dbus
-seatd
+sudo ln -s /etc/sv/dhcpcd /var/service
+sudo ln -s /etc/sv/dbus /var/service
+sudo ln -s /etc/sv/seatd /var/service
+sudo ln -s /etc/sv/ntpd /var/service
+sudo ln -s /etc/sv/pipewire /var/service
+sudo ln -s /etc/sv/bluetoothd /var/service
+sudo ln -s /etc/sv/sshd /var/service
+sudo ln -s /etc/sv/acpid /var/service
 echo "Services started successfully!"
 
 echo "managing user rights..."
 sudo usermod -aG _seatd "$USER"
+
+# Need to check if zzz is installed by default
