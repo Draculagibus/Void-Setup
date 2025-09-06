@@ -38,6 +38,7 @@ packages=(
   steam              # Game launcher
   swww               # Wallpaper
   grub-btrfs         # Manage BTRFS snapshots from GRUB
+  btrfs-progs        # BTRFS Commands
 )
 sudo xbps-install -Sy "${packages[@]}"
 echo "Packages installed successfully!"
