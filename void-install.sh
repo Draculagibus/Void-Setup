@@ -23,6 +23,7 @@ read -p "Nom d'utilisateur : " USERNAME
 read -p "Mot de passe utilisateur : " -s USER_PASS; echo
 
 # === Partitionnement ===
+sudo xbps-install -Sy parted
 parted -s "$DISK" mklabel gpt
 parted -s "$DISK" mkpart ESP fat32 1MiB 2049MiB
 parted -s "$DISK" set 1 boot on
