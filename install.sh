@@ -43,16 +43,6 @@ packages=(
 sudo xbps-install -Sy "${packages[@]}"
 echo "Packages installed successfully!"
 
-echo "Installing Hack Nerd Font..."
-TEMP_DIR=$(mktemp -d)
-wget -O "$TEMP_DIR/Hack.zip" https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip
-unzip "$TEMP_DIR/Hack.zip" -d "$TEMP_DIR"
-mkdir -p ~/.local/share/fonts
-mv "$TEMP_DIR"/*.ttf ~/.local/share/fonts/
-fc-cache -fv
-rm -rf "$TEMP_DIR"
-echo "Hack Nerd Font installed successfully!"
-
 echo "Make PipeWire run WirePlumber directly..."
 mkdir -p /etc/pipewire/pipewire.conf.d
 ln -s /usr/share/examples/wireplumber/10-wireplumber.conf /etc/pipewire/pipewire.conf.d/
