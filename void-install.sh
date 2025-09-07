@@ -120,6 +120,17 @@ VAI_install_base_system() {
     fi
 }
 
+VAI_enable_services() {
+    for svc in ${services}; do
+        if [ -d "${target}/etc/sv/${svc}" ]; then
+            ln -s "/etc/sv/${svc}" "${target}/etc/runit/runsvdir/default/${svc}"
+            VAI_info_msg "Enabled service: ${svc}"
+        else
+            VAI_info_msg "Service not found: ${svc}"
+        fi
+    done
+}
+
 VAI_prepare_chroot() {
     # Mount efivars if this is an EFI system
     if [ -d /sys/firmware/efi ] ; then
@@ -311,6 +322,9 @@ VAI_main() {
 
     VAI_print_step "Installing the base system"
     VAI_install_base_system
+
+    VAI_print_step "Enabling services"
+    VAI_enable_services
 
     VAI_print_step "Granting sudo to default user"
     VAI_configure_sudo
