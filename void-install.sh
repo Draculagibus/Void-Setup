@@ -45,9 +45,6 @@ mkdir -p /mnt/{boot,home}
 mount -o subvol=@home "${DISK}2" /mnt/home
 mount "${DISK}1" /mnt/boot
 
-# === Installation du système de base ===
-xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system
-
 # === Bind pour chroot ===
 for dir in dev proc sys; do mount --bind /$dir /mnt/$dir; done
 
