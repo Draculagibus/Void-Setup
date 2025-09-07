@@ -74,7 +74,7 @@ ln -s /etc/sv/dhcpcd /etc/runit/runsvdir/default/
 
 # Utilisateur
 echo "root:$ROOT_PASS" | chpasswd
-useradd -m -G wheel,audio,video,input -s /bin/bash "$USERNAME"
+useradd -m -G wheel,audio,video,input,_seatd -s /bin/bash "$USERNAME"
 echo "$USERNAME:$USER_PASS" | chpasswd
 
 # GRUB
