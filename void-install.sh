@@ -46,7 +46,7 @@ mount -o subvol=@home "${DISK}2" /mnt/home
 mount "${DISK}1" /mnt/boot
 
 # === Bind pour chroot ===
-mkdir -p /mnt/dev /mnt/proc /mnt/sys
+mkdir -p /mnt/dev /mnt/proc /mnt/sys /mnt/root
 for dir in dev proc sys; do mount --bind /$dir /mnt/$dir; done
 
 # === Copie du script post-install dans le système installé ===
