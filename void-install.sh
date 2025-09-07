@@ -109,10 +109,10 @@ VAI_install_base_system() {
     if [ -d /sys/firmware/efi ] ; then
         _grub="${_grub} grub-x86_64-efi"
     fi
-
-    echo "repository=https://raw.githubusercontent.com/Makrennel/hyprland-void/repository-x86_64-glibc" > /mnt/etc/xbps.d/hyprland-void.conf
+    
     XBPS_ARCH="${XBPS_ARCH}" xbps-install -Sy -R "${xbpsrepository}" -r /mnt base-system ${_grub}
-
+    echo "repository=https://raw.githubusercontent.com/Makrennel/hyprland-void/repository-x86_64-glibc" > /mnt/etc/xbps.d/hyprland-void.conf
+     
     # Install additional packages
     if [  -n "${pkgs}" ] ; then
         # shellcheck disable=SC2086
