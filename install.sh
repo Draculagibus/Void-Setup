@@ -1,10 +1,15 @@
 #!/bin/bash
 set -e
 
-echo "Add custom repository"
+echo "Add custom repository..."
 echo repository=https://raw.githubusercontent.com/Makrennel/hyprland-void/repository-x86_64-glibc | sudo tee /etc/xbps.d/hyprland-void.conf
 sudo xbps-install -S
 echo "Custom repository added successfully!"
+
+echo "Allow restricted packages..."
+git clone https://github.com/void-linux/void-packages.git ~/void-packages
+echo XBPS_ALLOW_RESTRICTED=yes >> ~/void-packages/etc/conf
+echo "Allowed restricted packages successfully"
 
 echo "Installing packages..."
 packages=(
@@ -34,7 +39,6 @@ packages=(
   micro              # Text editor
   starship           # Prompt customizer
   firefox            # Browser
-  discord            # Chat app
   steam              # Game launcher
   swww               # Wallpaper
   grub-btrfs         # Manage BTRFS snapshots from GRUB
@@ -42,6 +46,13 @@ packages=(
 )
 sudo xbps-install -Sy "${packages[@]}"
 echo "Packages installed successfully!"
+
+echo "Installing restricted packages..."
+restricted_packages=(
+  Discord                # Chat / Vocal servers
+)
+~/void-packages/xbps-src pkg "${restricted_packages[@]}"
+echo "Restricted packages installed successfully!"
 
 echo "Make PipeWire run WirePlumber directly..."
 mkdir -p /etc/pipewire/pipewire.conf.d
