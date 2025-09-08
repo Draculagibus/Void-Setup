@@ -13,6 +13,8 @@ echo "Allowed restricted packages successfully"
 
 echo "Installing packages..."
 packages=(
+  void-repo-multilib # Add multilib repos 
+  void-repo-nonfree  # Add nonfree repos
   ntp                # time sync
   dbus               # session bus
   seatd              # seat management
