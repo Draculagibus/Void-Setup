@@ -17,10 +17,13 @@ fi
 grep -qxF 'XBPS_ALLOW_RESTRICTED=yes' ~/void-packages/etc/conf || echo 'XBPS_ALLOW_RESTRICTED=yes' >> ~/void-packages/etc/conf
 echo "Allowed restricted packages successfully"
 
-echo "Installing packages..."
-packages=(
+echo "Expend the repos..."
   void-repo-multilib # Add multilib repos 
   void-repo-nonfree  # Add nonfree repos
+echo "repos extended successfully"
+
+echo "Installing packages..."
+packages=(
   ntp                # time sync
   dbus               # session bus
   seatd              # seat management
