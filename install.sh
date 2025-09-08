@@ -66,8 +66,8 @@ restricted_packages=(
 echo "Restricted packages installed successfully!"
 
 echo "Make PipeWire run WirePlumber directly..."
-mkdir -p /etc/pipewire/pipewire.conf.d
-ln -s /usr/share/examples/wireplumber/10-wireplumber.conf /etc/pipewire/pipewire.conf.d/
+sudo mkdir -p /etc/pipewire/pipewire.conf.d
+sudo ln -s /usr/share/examples/wireplumber/10-wireplumber.conf /etc/pipewire/pipewire.conf.d/
 echo "PipeWireSuccess!"
 
 echo "starting services..."
