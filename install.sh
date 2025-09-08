@@ -355,3 +355,4 @@ VAI_main() {
     VAI_main
     # Very important to release this before returning to dracut code
     set +e
+}
