@@ -60,7 +60,7 @@ echo "Packages installed successfully!"
 
 echo "Installing restricted packages..."
 restricted_packages=(
-  Discord                # Chat / Vocal servers
+  discord                # Chat / Vocal servers
 )
 ~/void-packages/xbps-src pkg "${restricted_packages[@]}"
 echo "Restricted packages installed successfully!"
