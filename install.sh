@@ -30,7 +30,7 @@ packages=(
   slurp              # Select a region with your mouse
   dolphin            # File explorer
   kitty              # Terminal
-  fish               # Shell
+  fish-shell         # Shell
   micro              # Text editor
   starship           # Prompt customizer
   firefox            # Browser
