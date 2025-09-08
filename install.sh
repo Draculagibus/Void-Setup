@@ -351,9 +351,7 @@ VAI_main() {
 }
 
 # If we are using the autoinstaller, launch it
-if getargbool 0 auto  ; then
     set -e
     VAI_main
     # Very important to release this before returning to dracut code
     set +e
-fi
