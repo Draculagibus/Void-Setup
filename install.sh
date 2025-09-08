@@ -55,34 +55,71 @@ packages=(
   grub-btrfs         # Manage BTRFS snapshots from GRUB
   btrfs-progs        # BTRFS Commands
 )
-sudo xbps-install -Sy "${packages[@]}"
+for pkg in "${packages[@]}"; do
+  if xbps-query -Rs "^${pkg}$" | grep -q installed; then
+    echo "$pkg is already installed"
+  else
+    sudo xbps-install -Sy "$pkg"
+  fi
+done
 echo "Packages installed successfully!"
 
 echo "Installing restricted packages..."
 restricted_packages=(
   discord                # Chat / Vocal servers
 )
-~/void-packages/xbps-src pkg "${restricted_packages[@]}"
+for pkg in "${restricted_packages[@]}"; do
+  if ls ~/void-packages/hostdir/binpkgs | grep -q "^${pkg}-"; then
+    echo "$pkg already built"
+  else
+    ~/void-packages/xbps-src pkg "$pkg"
+  fi
+done
 echo "Restricted packages installed successfully!"
 
-echo "Make PipeWire run WirePlumber directly..."
-sudo mkdir -p /etc/pipewire/pipewire.conf.d
-sudo ln -s /usr/share/examples/wireplumber/10-wireplumber.conf /etc/pipewire/pipewire.conf.d/
-echo "PipeWireSuccess!"
+echo "Configuring PipeWire..."
+WIREPLUMBER_CONF="/etc/pipewire/pipewire.conf.d/10-wireplumber.conf"
+if [ -L "$WIREPLUMBER_CONF" ]; then
+  echo "WirePlumber config already linked"
+else
+  sudo mkdir -p /etc/pipewire/pipewire.conf.d
+  sudo ln -s /usr/share/examples/wireplumber/10-wireplumber.conf "$WIREPLUMBER_CONF"
+  echo "WirePlumber config linked"
+fi
+echo "PipeWire configuration Success!"
 
-echo "starting services..."
-sudo ln -s /etc/sv/dhcpcd /var/service
-sudo ln -s /etc/sv/dbus /var/service
-sudo ln -s /etc/sv/seatd /var/service
-sudo ln -s /etc/sv/ntpd /var/service
-sudo ln -s /etc/sv/pipewire /var/service
-sudo ln -s /etc/sv/bluetoothd /var/service
-sudo ln -s /etc/sv/sshd /var/service
-sudo ln -s /etc/sv/acpid /var/service
+echo "Starting services..."
+
+declare -A services=(
+  [dhcpcd]="Network configuration via DHCP"
+  [dbus]="Session and system message bus"
+  [seatd]="Seat management for Wayland compositors"
+  [ntpd]="Time synchronization daemon"
+  [pipewire]="Audio and video server"
+  [bluetoothd]="Bluetooth device management"
+  [sshd]="Secure shell server for remote access"
+  [acpid]="ACPI event daemon for power management"
+)
+
+for svc in "${!services[@]}"; do
+  if [ -L "/var/service/$svc" ]; then
+    echo "Service '$svc' already enabled — ${services[$svc]}"
+  else
+    sudo ln -s "/etc/sv/$svc" "/var/service/$svc"
+    echo "Enabled service '$svc' — ${services[$svc]}"
+  fi
+done
 echo "Services started successfully!"
 
-echo "managing user rights..."
-sudo usermod -aG _seatd "$USER"
-
-# Need to check if zzz is installed by default
+echo "Managing user rights..."
+groups_to_add=(_seatd audio video input wheel)
+for grp in "${groups_to_add[@]}"; do
+  if id -nG "$USER" | grep -qw "$grp"; then
+    echo "User '$USER' is already in group '$grp'"
+  else
+    sudo usermod -aG "$grp" "$USER"
+    echo "Added user '$USER' to group '$grp'"
+  fi
+done
+echo "User rights added!"
 
