@@ -173,7 +173,7 @@ VAI_add_user() {
     else
         # For reasons that remain unclear, this does not work in musl
         echo "${username}:${password}" | chpasswd -c SHA512 -R "${target}"
-fi
+    fi
 }
 
 VAI_configure_grub() {
