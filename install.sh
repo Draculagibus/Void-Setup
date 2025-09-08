@@ -7,8 +7,14 @@ sudo xbps-install -S
 echo "Custom repository added successfully!"
 
 echo "Allow restricted packages..."
-git clone https://github.com/void-linux/void-packages.git ~/void-packages
-echo XBPS_ALLOW_RESTRICTED=yes >> ~/void-packages/etc/conf
+# Check if the directory already exists
+if [ -d "$HOME/void-packages" ]; then
+    echo "Repository already cloned at ~/void-packages"
+else
+    git clone https://github.com/void-linux/void-packages.git ~/void-packages
+    echo "Cloned void-packages repository"
+fi
+grep -qxF 'XBPS_ALLOW_RESTRICTED=yes' ~/void-packages/etc/conf || echo 'XBPS_ALLOW_RESTRICTED=yes' >> ~/void-packages/etc/conf
 echo "Allowed restricted packages successfully"
 
 echo "Installing packages..."
