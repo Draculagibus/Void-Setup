@@ -18,8 +18,8 @@ grep -qxF 'XBPS_ALLOW_RESTRICTED=yes' ~/void-packages/etc/conf || echo 'XBPS_ALL
 echo "Allowed restricted packages successfully"
 
 echo "Expend the repos..."
-  void-repo-multilib # Add multilib repos 
-  void-repo-nonfree  # Add nonfree repos
+  sudo xbps-install -S void-repo-multilib # Add multilib repos 
+  sudo xbps-install -S void-repo-nonfree  # Add nonfree repos
 echo "repos extended successfully"
 
 echo "Installing packages..."
