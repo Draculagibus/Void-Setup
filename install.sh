@@ -1,7 +1,5 @@
 #!/bin/sh
 
-type getargbool >/dev/null 2>&1 || . /lib/dracut-lib.sh
-
 # These functions pulled from void's excellent mklive.sh
 VAI_info_msg() {
     printf "\033[1m%s\n\033[m" "$@"
@@ -273,27 +271,22 @@ VAI_configure_autoinstall() {
     esac
 
     # --------------- Pull config URL out of kernel cmdline -------------------------
-    set +e
-    if getargbool 0 autourl ; then
-        set -e
-        xbps-uhelper fetch "$(getarg autourl)>/etc/autoinstall.cfg"
-
-    else
-        set -e
-        mv /etc/autoinstall.default /etc/autoinstall.cfg
-    fi
-
-    # Read in the resulting config file which we got via some method
-    if [ -f /etc/autoinstall.cfg ] ; then
+    # Load config manually
+    CONFIG_PATH="./autoinstall.cfg"  # or wherever you put it
+    
+    if [ -f "$CONFIG_PATH" ]; then
         VAI_info_msg "Reading configuration file"
-        . ./etc/autoinstall.cfg
+        . "$CONFIG_PATH"
+    else
+        VAI_info_msg "No config file found at $CONFIG_PATH"
+        exit 1
     fi
-
+    
     # Bail out if we didn't get a usable disk
-    if [ -z "$disk" ] ; then
-        die "No valid disk!"
+    if [ -z "$disk" ]; then
+        echo "No valid disk specified in config!"
+        exit 1
     fi
-}
 
 VAI_main() {
     CURRENT_STEP=0
