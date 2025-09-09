@@ -39,6 +39,8 @@ packages=(
   bluez              # Bluetooth managment
   xdg-desktop-portal-hyprland # Window Manager
   hyprland           # Window Manager
+  hyprpaper          # Wallpaper Manager
+  hyprlock           # LockScreen Manager
   hyprland-qtutils   # Qt/QML utility for Hyprland
   quickshell         # Desktop shell toolkit
   wl-clipboard       # To copy screenshots to clipboard
