@@ -7,5 +7,5 @@ This script automates the installation of Void Linux with custom configurations.
 ```bash
 git clone https://github.com/Draculagibus/Void-Setup.git
 cd Void-Setup/
-chmod +x void-install.sh
+chmod +x install.sh
 ./install.sh
