@@ -17,7 +17,7 @@ fi
 grep -qxF 'XBPS_ALLOW_RESTRICTED=yes' ~/void-packages/etc/conf || echo 'XBPS_ALLOW_RESTRICTED=yes' >> ~/void-packages/etc/conf
 echo "Allowed restricted packages successfully"
 
-echo "Expend the repos..."
+echo "Expand the repos..."
   sudo xbps-install -Sy void-repo-multilib # Add multilib repos 
   sudo xbps-install -Sy void-repo-nonfree  # Add nonfree repos
 echo "repos extended successfully"
@@ -34,9 +34,9 @@ packages=(
   mesa-vdpau         # Video acceleration
   wget               # Download stuff on the web
   unzip              # Manage zip files
-  pipewire           # Sound managment
+  pipewire           # Sound management
   pavucontrol        # Volume control
-  bluez              # Bluetooth managment
+  bluez              # Bluetooth management
   xdg-desktop-portal-hyprland # Window Manager
   hyprland           # Window Manager
   hyprpaper          # Wallpaper Manager
@@ -57,14 +57,24 @@ packages=(
   swww               # Wallpaper
   grub-btrfs         # Manage BTRFS snapshots from GRUB
   btrfs-progs        # BTRFS Commands
+  git
 )
+to_install=()
 for pkg in "${packages[@]}"; do
-  if xbps-query -Rs "^${pkg}$" | grep -q installed; then
+  if xbps-query -l | grep -qw "$pkg"; then
     echo "$pkg is already installed"
   else
-    sudo xbps-install -Sy "$pkg"
+    to_install+=("$pkg")
   fi
 done
+
+if [ ${#to_install[@]} -gt 0 ]; then
+  echo "Installing missing packages: ${to_install[*]}"
+  sudo xbps-install -Sy "${to_install[@]}"
+else
+  echo "All packages are already installed"
+fi
+
 echo "Packages installed successfully!"
 
 echo "Installing restricted packages..."
