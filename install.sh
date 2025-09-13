@@ -94,8 +94,8 @@ echo "Restricted packages installed successfully!"
 echo "Installing some packages manually"
 git clone https://github.com/Gustash/hyprshot.git Hyprshot
 mkdir -p ~/.local/bin
-ln -s $(pwd)/Hyprshot/hyprshot $HOME/.local/bin
 chmod +x Hyprshot/hyprshot
+cp Hyprshot/hyprshot $HOME/.local/bin
 echo "Packages installed..."
 
 echo "Configuring PipeWire..."
