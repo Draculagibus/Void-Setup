@@ -59,7 +59,6 @@ packages=(
   btrfs-progs        # BTRFS Commands
   jq                 # Dependencie for Hyprshot
   libnotify          # Dependencie for Hyprshot
-  git
 )
 to_install=()
 for pkg in "${packages[@]}"; do
@@ -91,6 +90,12 @@ for pkg in "${restricted_packages[@]}"; do
   fi
 done
 echo "Restricted packages installed successfully!"
+
+echo "Installing some packages manually"
+git clone https://github.com/Gustash/hyprshot.git Hyprshot
+ln -s $(pwd)/Hyprshot/hyprshot $HOME/.local/bin
+chmod +x Hyprshot/hyprshot
+echo "Packages installed..."
 
 echo "Configuring PipeWire..."
 WIREPLUMBER_CONF="/etc/pipewire/pipewire.conf.d/10-wireplumber.conf"
