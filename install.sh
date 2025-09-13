@@ -57,6 +57,8 @@ packages=(
   swww               # Wallpaper
   grub-btrfs         # Manage BTRFS snapshots from GRUB
   btrfs-progs        # BTRFS Commands
+  jq                 # Dependencie for Hyprshot
+  libnotify          # Dependencie for Hyprshot
   git
 )
 to_install=()
