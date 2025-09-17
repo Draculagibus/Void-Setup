@@ -152,7 +152,7 @@ echo "Setting up VoidSplash Plymouth theme..."
 if [ ! -d /usr/share/plymouth/themes/voidsplash-1s ]; then
     echo "→ Installing voidsplash-1s theme..."
     git clone --depth=1 https://github.com/elwint/voidsplash-plymouth.git /tmp/voidsplash
-    cp -r /tmp/voidsplash/voidsplash-1s /usr/share/plymouth/themes/
+    sudo cp -r /tmp/voidsplash/voidsplash-1s /usr/share/plymouth/themes/
     rm -rf /tmp/voidsplash
 fi
 
