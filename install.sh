@@ -158,7 +158,7 @@ fi
 
 # Set the theme and regenerate initramfs
 echo "→ Setting voidsplash-1s as default theme..."
-plymouth-set-default-theme -R voidsplash-1s
+sudo plymouth-set-default-theme -R voidsplash-1s
 
 # Enable splash on shutdown (runit)
 SHUTDOWN_SCRIPT="/etc/runit/shutdown.d/00-voidsplash.sh"
