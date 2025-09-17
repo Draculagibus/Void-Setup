@@ -164,20 +164,21 @@ sudo plymouth-set-default-theme -R voidsplash-1s
 SHUTDOWN_SCRIPT="/etc/runit/shutdown.d/00-voidsplash.sh"
 if [ ! -f "$SHUTDOWN_SCRIPT" ]; then
     echo "→ Enabling splash on shutdown..."
-    cat <<'EOF' > "$SHUTDOWN_SCRIPT"
+    sudo tee "$SHUTDOWN_SCRIPT" > /dev/null <<'EOF'
 #!/bin/sh
 plymouthd --mode=shutdown &
 sleep 1
 plymouth --show-splash
 EOF
-    chmod +x "$SHUTDOWN_SCRIPT"
+    sudo chmod +x "$SHUTDOWN_SCRIPT"
 fi
 
 # Ensure GRUB has splash enabled
 if grep -q 'GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub; then
     echo "→ Updating GRUB to enable splash..."
-    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& splash/' /etc/default/grub
-    grub-mkconfig -o /boot/grub/grub.cfg
+    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& splash/' /etc/default/grub
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
 fi
+
 
 echo "✅ VoidSplash Plymouth setup complete."
