@@ -148,5 +148,5 @@ done
 echo "User rights added!"
 
 echo "Apply Dot files..."
-cp -rT ./config "$HOME/.config"
+sudo cp -rT ./config "$HOME/.config"
 echo "Dot files applied successfully!"
