@@ -86,6 +86,7 @@ for pkg in "${restricted_packages[@]}"; do
   if ls ~/void-packages/hostdir/binpkgs | grep -q "^${pkg}-"; then
     echo "$pkg already built"
   else
+    ~/void-packages/xbps-src binary-bootstrap
     ~/void-packages/xbps-src pkg "$pkg"
   fi
 done
