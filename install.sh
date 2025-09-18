@@ -177,29 +177,30 @@ sudo chmod +x "${SV_DIR}/run"
 # Enable the service
 if [ ! -e "/var/service/agetty-autologin-${TTY}" ]; then
     sudo ln -s "${SV_DIR}" "/var/service/"
-    echo "✅ Autologin service enabled."
+    echo "Autologin service enabled."
 else
-    echo "ℹ️ Autologin service already active."
+    echo "Autologin service already active."
 fi
 
-echo "🧠 Configuring fish to launch Hyprland on ${TTY}..."
+echo "Configuring bash to launch Hyprland on ${TTY}..."
 
-# Ensure fish config exists
-mkdir -p "$(dirname "${FISH_CONFIG}")"
-sudo touch "${FISH_CONFIG}"
+BASH_PROFILE="/home/${USER_NAME}/.bash_profile"
+
+# Ensure .bash_profile exists
+touch "${BASH_PROFILE}"
 
 # Add Hyprland exec block if not present
-if ! grep -q "exec Hyprland" "${FISH_CONFIG}"; then
-    cat <<EOF >> "${FISH_CONFIG}"
+if ! grep -q "exec Hyprland" "${BASH_PROFILE}"; then
+    cat <<'EOF' >> "${BASH_PROFILE}"
 
-# Autostart Hyprland on ${TTY}
-if test (tty) = "/dev/${TTY}"
+# Autostart Hyprland on tty1
+if [ "$(tty)" = "/dev/tty1" ]; then
     exec Hyprland
-end
+fi
 EOF
-    echo "✅ Hyprland launch added to fish config."
+    echo "Hyprland launch added to .bash_profile."
 else
-    echo "ℹ️ Hyprland launch already present in fish config."
+    echo "Hyprland launch already present in .bash_profile."
 fi
 
-echo "🎉 Setup complete. Reboot to test autologin and Hyprland boot."
+echo "Setup complete. Reboot to test autologin and Hyprland boot."
