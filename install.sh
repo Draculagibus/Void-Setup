@@ -92,7 +92,12 @@ done
 echo "Restricted packages installed successfully!"
 
 echo "Installing some packages manually"
-git clone https://github.com/Gustash/hyprshot.git Hyprshot
+if [ -d "Hyprshot" ]; then
+    echo "Directory Hyprshot already exists. Skipping git clone."
+else
+    echo "Cloning repository into Hyprshot..."
+    git clone https://github.com/Gustash/hyprshot.git Hyprshot
+fi
 chmod +x Hyprshot/hyprshot
 sudo cp Hyprshot/hyprshot /usr/local/bin
 echo "Packages installed..."
@@ -159,7 +164,7 @@ TTY="tty1"
 SV_DIR="/etc/sv/agetty-autologin-${TTY}"
 FISH_CONFIG="/home/${USER_NAME}/.config/fish/config.fish"
 
-echo "🔧 Creating autologin service for ${USER_NAME} on ${TTY}..."
+echo "Creating autologin service for ${USER_NAME} on ${TTY}..."
 
 # Create runit service for autologin
 sudo mkdir -p "${SV_DIR}"
