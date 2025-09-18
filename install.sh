@@ -108,6 +108,10 @@ else
 fi
 echo "PipeWire configuration Success!"
 
+echo "Configure the default shell..."
+chsh -s /usr/bin/fish
+echo "Default shell configured successfully!"
+
 echo "Starting services..."
 
 declare -A services=(
@@ -143,6 +147,7 @@ for grp in "${groups_to_add[@]}"; do
 done
 echo "User rights added!"
 
+echo "Apply Dot files..."
 apply_config() {
     local src_dir="$1"
     local target_dir="$2"
@@ -159,3 +164,4 @@ apply_config() {
 apply_config "./configs/hypr" "$HOME/.config/hypr"
 apply_config "./configs/fish" "$HOME/.config/fish"
 apply_config "./configs/kitty" "$HOME/.config/kitty"
+echo "Dot files applied successfully!"
