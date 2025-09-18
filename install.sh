@@ -161,7 +161,7 @@ apply_config() {
     done
 }
 
-apply_config "./configs/hypr" "$HOME/.config/hypr"
-apply_config "./configs/fish" "$HOME/.config/fish"
-apply_config "./configs/kitty" "$HOME/.config/kitty"
+apply_config ".config/hypr" "$HOME/.config/hypr"
+apply_config ".config/fish" "$HOME/.config/fish"
+apply_config ".config/kitty" "$HOME/.config/kitty"
 echo "Dot files applied successfully!"
