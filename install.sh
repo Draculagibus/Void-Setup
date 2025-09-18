@@ -113,12 +113,7 @@ else
 fi
 echo "PipeWire configuration Success!"
 
-echo "Configure the default shell..."
-chsh -s /usr/bin/fish
-echo "Default shell configured successfully!"
-
 echo "Starting services..."
-
 declare -A services=(
   [dhcpcd]="Network configuration via DHCP"
   [dbus]="Session and system message bus"
