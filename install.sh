@@ -156,14 +156,6 @@ echo "Apply Dot files..."
 sudo cp -rT .config $HOME/.config
 echo "Dot files applied successfully!"
 
-echo "Autologin and Auto-Hyprland..."
-set -euo pipefail
-
-USER_NAME="$(whoami)"
-TTY="tty1"
-SV_DIR="/etc/sv/agetty-autologin-${TTY}"
-FISH_CONFIG="/home/${USER_NAME}/.config/fish/config.fish"
-
 echo "Creating autologin service for ${USER_NAME} on ${TTY}..."
 
 # Create runit service for autologin
