@@ -148,20 +148,5 @@ done
 echo "User rights added!"
 
 echo "Apply Dot files..."
-apply_config() {
-    local src_dir="$1"
-    local target_dir="$2"
-
-    echo "→ Applying config from $src_dir to $target_dir"
-
-    mkdir -p "$target_dir"
-    for file in "$src_dir"/*; do
-        local filename=$(basename "$file")
-        cp -f "$file" "$target_dir/$filename"
-    done
-}
-
-apply_config ".config/hypr" "$HOME/.config/hypr"
-apply_config ".config/fish" "$HOME/.config/fish"
-apply_config ".config/kitty" "$HOME/.config/kitty"
+cp -rT ./config "$HOME/.config"
 echo "Dot files applied successfully!"
