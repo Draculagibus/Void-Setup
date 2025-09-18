@@ -59,7 +59,6 @@ packages=(
   btrfs-progs        # BTRFS Commands
   jq                 # Dependencie for Hyprshot
   libnotify          # Dependencie for Hyprshot
-  plymouth           # Splash Boot
 )
 to_install=()
 for pkg in "${packages[@]}"; do
@@ -143,42 +142,3 @@ for grp in "${groups_to_add[@]}"; do
   fi
 done
 echo "User rights added!"
-
-# === VoidSplash Plymouth Setup ===
-
-echo "Setting up VoidSplash Plymouth theme..."
-
-# Clone and install the theme
-if [ ! -d /usr/share/plymouth/themes/voidsplash-1s ]; then
-    echo "→ Installing voidsplash-1s theme..."
-    git clone --depth=1 https://github.com/elwint/voidsplash-plymouth.git /tmp/voidsplash
-    sudo cp -r /tmp/voidsplash/voidsplash-1s /usr/share/plymouth/themes/
-    rm -rf /tmp/voidsplash
-fi
-
-# Set the theme and regenerate initramfs
-echo "→ Setting voidsplash-1s as default theme..."
-sudo plymouth-set-default-theme -R voidsplash-1s
-
-# Enable splash on shutdown (runit)
-SHUTDOWN_SCRIPT="/etc/runit/shutdown.d/00-voidsplash.sh"
-if [ ! -f "$SHUTDOWN_SCRIPT" ]; then
-    echo "→ Enabling splash on shutdown..."
-    sudo tee "$SHUTDOWN_SCRIPT" > /dev/null <<'EOF'
-#!/bin/sh
-plymouthd --mode=shutdown &
-sleep 1
-plymouth --show-splash
-EOF
-    sudo chmod +x "$SHUTDOWN_SCRIPT"
-fi
-
-# Ensure GRUB has splash enabled
-if grep -q 'GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub; then
-    echo "→ Updating GRUB to enable splash..."
-    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& splash/' /etc/default/grub
-    sudo grub-mkconfig -o /boot/grub/grub.cfg
-fi
-
-
-echo "✅ VoidSplash Plymouth setup complete."
