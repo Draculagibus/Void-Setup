@@ -151,27 +151,27 @@ echo "Apply Dot files..."
 sudo cp -rT .config $HOME/.config
 echo "Dot files applied successfully!"
 
-echo "Creating autologin service for ${USER_NAME} on ${TTY}..."
+echo "Creating autologin service for $(logname) on TTY1..."
 
 # Create runit service for autologin
-sudo mkdir -p "${SV_DIR}"
-sudo tee "${SV_DIR}/run" > /dev/null <<EOF
+sudo mkdir -p "/etc/sv/agetty-autologin-tty1"
+sudo tee "/etc/sv/agetty-autologin-tty1/run" > /dev/null <<EOF
 #!/bin/sh
-exec agetty --autologin ${USER_NAME} --noclear ${TTY} 38400 linux
+exec agetty --autologin $(logname) --noclear tty1 38400 linux
 EOF
-sudo chmod +x "${SV_DIR}/run"
+sudo chmod +x "/etc/sv/agetty-autologin-tty1/run"
 
 # Enable the service
-if [ ! -e "/var/service/agetty-autologin-${TTY}" ]; then
-    sudo ln -s "${SV_DIR}" "/var/service/"
+if [ ! -e "/var/service/agetty-autologin-tty1" ]; then
+    sudo ln -s "/etc/sv/agetty-autologin-tty1" "/var/service/"
     echo "Autologin service enabled."
 else
     echo "Autologin service already active."
 fi
 
-echo "Configuring bash to launch Hyprland on ${TTY}..."
+echo "Configuring bash to launch Hyprland on TTY1..."
 
-BASH_PROFILE="/home/${USER_NAME}/.bash_profile"
+BASH_PROFILE="/home/$(logname)/.bash_profile"
 
 # Ensure .bash_profile exists
 touch "${BASH_PROFILE}"
