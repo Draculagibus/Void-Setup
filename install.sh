@@ -186,7 +186,7 @@ echo "🧠 Configuring fish to launch Hyprland on ${TTY}..."
 
 # Ensure fish config exists
 mkdir -p "$(dirname "${FISH_CONFIG}")"
-touch "${FISH_CONFIG}"
+sudo touch "${FISH_CONFIG}"
 
 # Add Hyprland exec block if not present
 if ! grep -q "exec Hyprland" "${FISH_CONFIG}"; then
