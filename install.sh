@@ -142,3 +142,20 @@ for grp in "${groups_to_add[@]}"; do
   fi
 done
 echo "User rights added!"
+
+apply_config() {
+    local src_dir="$1"
+    local target_dir="$2"
+
+    echo "→ Applying config from $src_dir to $target_dir"
+
+    mkdir -p "$target_dir"
+    for file in "$src_dir"/*; do
+        local filename=$(basename "$file")
+        cp -f "$file" "$target_dir/$filename"
+    done
+}
+
+apply_config "./configs/hypr" "$HOME/.config/hypr"
+apply_config "./configs/fish" "$HOME/.config/fish"
+apply_config "./configs/kitty" "$HOME/.config/kitty"
