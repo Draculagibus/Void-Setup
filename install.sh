@@ -150,3 +150,51 @@ echo "User rights added!"
 echo "Apply Dot files..."
 sudo cp -rT .config $HOME/.config
 echo "Dot files applied successfully!"
+
+echo "Autologin and Auto-Hyprland..."
+set -euo pipefail
+
+USER_NAME="$(whoami)"
+TTY="tty1"
+SV_DIR="/etc/sv/agetty-autologin-${TTY}"
+FISH_CONFIG="/home/${USER_NAME}/.config/fish/config.fish"
+
+echo "🔧 Creating autologin service for ${USER_NAME} on ${TTY}..."
+
+# Create runit service for autologin
+sudo mkdir -p "${SV_DIR}"
+sudo tee "${SV_DIR}/run" > /dev/null <<EOF
+#!/bin/sh
+exec agetty --autologin ${USER_NAME} --noclear ${TTY} 38400 linux
+EOF
+sudo chmod +x "${SV_DIR}/run"
+
+# Enable the service
+if [ ! -e "/var/service/agetty-autologin-${TTY}" ]; then
+    sudo ln -s "${SV_DIR}" "/var/service/"
+    echo "✅ Autologin service enabled."
+else
+    echo "ℹ️ Autologin service already active."
+fi
+
+echo "🧠 Configuring fish to launch Hyprland on ${TTY}..."
+
+# Ensure fish config exists
+mkdir -p "$(dirname "${FISH_CONFIG}")"
+touch "${FISH_CONFIG}"
+
+# Add Hyprland exec block if not present
+if ! grep -q "exec Hyprland" "${FISH_CONFIG}"; then
+    cat <<EOF >> "${FISH_CONFIG}"
+
+# Autostart Hyprland on ${TTY}
+if test (tty) = "/dev/${TTY}"
+    exec Hyprland
+end
+EOF
+    echo "✅ Hyprland launch added to fish config."
+else
+    echo "ℹ️ Hyprland launch already present in fish config."
+fi
+
+echo "🎉 Setup complete. Reboot to test autologin and Hyprland boot."
