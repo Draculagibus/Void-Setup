@@ -148,6 +148,12 @@ for grp in "${groups_to_add[@]}"; do
 done
 echo "User rights added!"
 
+echo "Install Bibata Cursor..."
+wget -nc https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz
+tar -xf Bibata-Modern-Classic.tar.xz
+mv Bibata-Modern-Classic/ /usr/share/icons/
+echo "Bibata cursor installed successfully!"
+
 echo "Apply Dot files..."
 sudo cp -rT .config $HOME/.config
 echo "Dot files applied successfully!"
