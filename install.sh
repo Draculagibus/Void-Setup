@@ -104,6 +104,7 @@ fi
 chmod +x Hyprshot/hyprshot
 sudo rm -rf /usr/local/bin/hyprshot
 sudo mv -f Hyprshot/hyprshot /usr/local/bin
+rm -rf Hyprshot
 echo "Packages installed..."
 
 echo "Configuring PipeWire..."
