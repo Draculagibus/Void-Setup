@@ -203,3 +203,10 @@ else
 fi
 
 echo "Setup complete. Reboot to test autologin and Hyprland boot."
+
+echo
+read -rp "Would you like to reboot now? [y/N] " answer
+case "$answer" in
+    [Yy]* ) echo "Rebooting..."; sudo reboot ;;
+    * ) echo "Reboot skipped." ;;
+esac
