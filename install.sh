@@ -102,7 +102,7 @@ else
     git clone https://github.com/Gustash/hyprshot.git Hyprshot
 fi
 chmod +x Hyprshot/hyprshot
-sudo mv Hyprshot/hyprshot /usr/local/bin
+sudo mv -f Hyprshot/hyprshot /usr/local/bin
 echo "Packages installed..."
 
 echo "Configuring PipeWire..."
@@ -153,8 +153,8 @@ echo "User rights added!"
 echo "Install Bibata Cursor..."
 wget -nc https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz
 tar -xf Bibata-Modern-Classic.tar.xz
-mkdir ~/.icons/
-mv Bibata-Modern-Classic/ ~/.icons/
+mkdir -p ~/.icons/
+mv -f Bibata-Modern-Classic/ ~/.icons/
 rm Bibata-Modern-Classic.tar.xz
 echo "Bibata cursor installed successfully!"
 
