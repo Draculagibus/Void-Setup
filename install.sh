@@ -206,8 +206,48 @@ else
     echo "Hyprland launch already present in .bash_profile."
 fi
 
-echo "Setup complete. Reboot to test autologin and Hyprland boot."
+read -p "Do you want to set up Git and SSH access? (y/n): " use_git
+if [[ "$use_git" =~ ^[Yy]$ ]]; then
+  key_path="$HOME/.ssh/id_ed25519"
 
+  if [ ! -f "$key_path" ]; then
+    read -p "No SSH key found. Generate one now? (y/n): " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+      read -p "Enter your email for the SSH key: " email
+      ssh-keygen -t ed25519 -C "$email" -f "$key_path" -N ""
+      eval "$(ssh-agent -s)"
+      ssh-add "$key_path"
+
+      # Copy public key to clipboard (Wayland-first)
+      if command -v wl-copy &>/dev/null; then
+        wl-copy < "$key_path.pub"
+        echo "Public key copied to clipboard (via wl-copy)"
+      elif command -v xclip &>/dev/null; then
+        xclip -selection clipboard < "$key_path.pub"
+        echo "Public key copied to clipboard (via xclip)"
+      elif command -v pbcopy &>/dev/null; then
+        pbcopy < "$key_path.pub"
+        echo "Public key copied to clipboard (via pbcopy)"
+      else
+        echo "Couldn't auto-copy. Here's your public key:"
+        cat "$key_path.pub"
+      fi
+
+      echo -e "\n Add this key to your GitHub or GitLab account:"
+      echo "GitHub: https://github.com/settings/keys"
+      echo "GitLab: https://gitlab.com/-/profile/keys"
+    else
+      echo "SSH key generation skipped."
+    fi
+  else
+    echo "SSH key already exists at $key_path"
+  fi
+else
+  echo "Git setup skipped."
+fi
+
+
+echo "Setup complete. Reboot to test autologin and Hyprland boot."
 echo
 read -rp "Would you like to reboot now? [y/N] " answer
 case "$answer" in
