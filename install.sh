@@ -29,7 +29,7 @@ packages=(
   seatd              # seat management
   dumb_runtime_dir   # XDG_RUNTIME_DIR handler
   mesa-dri           # OpenGL support
-  mesa-dri-32        # OpenGL support
+  mesa-32bit         # OpenGL support
   mesa-vulkan-radeon # Vulkan support
   mesa-vaapi         # Video acceleration
   mesa-vdpau         # Video acceleration
