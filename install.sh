@@ -102,7 +102,8 @@ else
     git clone https://github.com/Gustash/hyprshot.git Hyprshot
 fi
 chmod +x Hyprshot/hyprshot
-sudo rm -rf /usr/local/bin/hyprshot && mv -f Hyprshot/hyprshot /usr/local/bin
+sudo rm -rf /usr/local/bin/hyprshot
+sudo mv -f Hyprshot/hyprshot /usr/local/bin
 echo "Packages installed..."
 
 echo "Configuring PipeWire..."
