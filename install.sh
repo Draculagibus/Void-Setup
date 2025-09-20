@@ -158,7 +158,9 @@ mv Bibata-Modern-Classic/ ~/.icons/
 echo "Bibata cursor installed successfully!"
 
 echo "Manage dotfiles with stow and git..."
-stow dotfiles/*
+cd dotfiles/
+stow --target="$HOME" *
+cd ..
 echo "Dotfiles managed!"
 
 echo "Creating autologin service for $(logname) on TTY1..."
