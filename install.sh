@@ -60,6 +60,7 @@ packages=(
   btrfs-progs        # BTRFS Commands
   jq                 # Dependencie for Hyprshot
   libnotify          # Dependencie for Hyprshot
+  stow               # Manage Symlink for Dotfiles
 )
 to_install=()
 for pkg in "${packages[@]}"; do
@@ -155,6 +156,10 @@ tar -xf Bibata-Modern-Classic.tar.xz
 mkdir ~/.icons/
 mv Bibata-Modern-Classic/ ~/.icons/
 echo "Bibata cursor installed successfully!"
+
+echo "Manage dotfiles with stow and git..."
+stow dotfiles/*
+echo "Dotfiles managed!"
 
 echo "Creating autologin service for $(logname) on TTY1..."
 
