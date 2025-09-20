@@ -102,7 +102,7 @@ else
     git clone https://github.com/Gustash/hyprshot.git Hyprshot
 fi
 chmod +x Hyprshot/hyprshot
-sudo cp Hyprshot/hyprshot /usr/local/bin
+sudo mv Hyprshot/hyprshot /usr/local/bin
 echo "Packages installed..."
 
 echo "Configuring PipeWire..."
@@ -155,6 +155,7 @@ wget -nc https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata
 tar -xf Bibata-Modern-Classic.tar.xz
 mkdir ~/.icons/
 mv Bibata-Modern-Classic/ ~/.icons/
+rm Bibata-Modern-Classic.tar.xz
 echo "Bibata cursor installed successfully!"
 
 echo "Manage dotfiles with stow and git..."
