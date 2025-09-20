@@ -156,10 +156,6 @@ mkdir ~/.icons/
 mv Bibata-Modern-Classic/ ~/.icons/
 echo "Bibata cursor installed successfully!"
 
-echo "Apply Dot files..."
-sudo cp -rT .config $HOME/.config
-echo "Dot files applied successfully!"
-
 echo "Creating autologin service for $(logname) on TTY1..."
 
 # Create runit service for autologin
