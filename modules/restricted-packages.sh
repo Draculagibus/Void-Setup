@@ -109,21 +109,18 @@ build_and_install_package() {
     log "Processing restricted package: $package"
     
     # Check if package is already built
-    if ls "$VOID_PACKAGES_DIR/hostdir/binpkgs" | grep -q "^${package}-" 2>/dev/null; then
-        info "$package already built"
-        
-        # Try to install if not already installed
-        if ! is_package_installed "$package"; then
-            install_built_package "$package"
-        else
-            info "$package already installed"
-        fi
+    if ls "$VOID_PACKAGES_DIR/hostdir/binpkgs" 2>/dev/null | grep -q "^${package}-"; then
+        log "$package already built"
     else
         log "Building $package from source..."
-        build_package_from_source "$package"
         
-        # Install after building
-        install_built_package "$package"
+        # Bootstrap if needed and build package
+        if (cd "$VOID_PACKAGES_DIR" && ./xbps-src binary-bootstrap && ./xbps-src pkg "$package"); then
+            log "Successfully built package: $package"
+        else
+            warn "Failed to build package: $package"
+            return 1
+        fi
     fi
 }
 
@@ -155,5 +152,11 @@ install_built_package() {
         fi
     else
         warn "Built package file not found for: $package"
+        # Try installing from hostdir/binpkgs repository
+        if (cd "$VOID_PACKAGES_DIR" && sudo xbps-install -R hostdir/binpkgs "$package"); then
+            log "Successfully installed from local repository: $package"
+        else
+            warn "Failed to install $package from local repository"
+        fi
     fi
 }
