@@ -51,6 +51,13 @@ check_not_root() {
     fi
 }
 
+# Check if sudo is available
+check_sudo() {
+    if ! command -v sudo &> /dev/null; then
+        error "sudo is required but not installed. Please install sudo first."
+    fi
+}
+
 # Validate config files exist
 validate_config_files() {
     local required_files=(
@@ -81,6 +88,7 @@ source_modules() {
         "modules/dotfiles.sh"
         "modules/autologin.sh"
         "modules/git-setup.sh"
+        "modules/smart-aliases.sh"
     )
     
     for module in "${modules[@]}"; do
@@ -103,6 +111,7 @@ main() {
     
     # Pre-flight checks
     check_not_root
+    check_sudo
     validate_config_files
     
     # Source all modules
@@ -119,12 +128,15 @@ main() {
     setup_dotfiles
     setup_autologin
     
+    # Setup smart aliases
+    setup_smart_aliases
+    
     # Optional Git/SSH setup
     if ask_yes_no "Do you want to set up Git and SSH access?"; then
         setup_git_ssh
     fi
     
-    log "Setup complete!"
+    log "Setup complete! 🎉"
     
     # Ask for reboot
     if ask_yes_no "Would you like to reboot now to test the setup?"; then
