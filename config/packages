@@ -1,0 +1,115 @@
+# =============================================================================
+# Package Configuration
+# =============================================================================
+# This file defines packages to be installed via xbps-install
+# 
+# Format guidelines:
+# - Keep packages organized by category
+# - Add comments for each package explaining its purpose
+# - One package per line for easy management
+# - Use consistent indentation
+
+# Core system packages
+SYSTEM_PACKAGES=(
+    "ntp"                    # Time synchronization
+    "dbus"                   # Session and system message bus
+    "seatd"                  # Seat management for Wayland
+    "dumb_runtime_dir"       # XDG_RUNTIME_DIR handler
+)
+
+# Graphics and multimedia
+GRAPHICS_PACKAGES=(
+    "mesa-dri"               # OpenGL support
+    "mesa-dri-32bit"         # 32-bit OpenGL support
+    "mesa-vulkan-radeon"     # Vulkan support for AMD
+    "mesa-vaapi"             # Video acceleration API
+    "mesa-vdpau"             # Video Decode and Presentation API
+    "pipewire"               # Modern audio server
+    "pavucontrol"            # PulseAudio volume control
+)
+
+# Hyprland and desktop environment
+HYPRLAND_PACKAGES=(
+    "hyprland"                      # Wayland compositor
+    "hyprpaper"                     # Wallpaper manager
+    "hyprlock"                      # Screen locker
+    "hyprland-qtutils"              # Qt/QML utilities
+    "quickshell"                    # Desktop shell toolkit
+    "xdg-desktop-portal-hyprland"   # Portal for screen sharing, etc.
+    "swww"                          # Alternative wallpaper daemon
+)
+
+# System utilities
+UTILITY_PACKAGES=(
+    "wget"                   # Download files from web
+    "unzip"                  # Archive extraction
+    "wl-clipboard"           # Wayland clipboard utilities
+    "cliphist"               # Clipboard history manager
+    "grim"                   # Screenshot utility for Wayland
+    "slurp"                  # Screen area selection
+    "jq"                     # JSON processor (dependency for tools)
+    "libnotify"              # Desktop notifications
+    "stow"                   # Symlink manager for dotfiles
+)
+
+# Applications
+APPLICATION_PACKAGES=(
+    "dolphin"                # KDE file manager
+    "kitty"                  # Terminal emulator
+    "fish-shell"             # User-friendly shell
+    "micro"                  # Simple text editor
+    "starship"               # Cross-shell prompt
+    "firefox"                # Web browser
+    "steam"                  # Gaming platform
+)
+
+# Bluetooth support
+BLUETOOTH_PACKAGES=(
+    "bluez"                  # Bluetooth protocol stack
+)
+
+# Filesystem tools
+FILESYSTEM_PACKAGES=(
+    "grub-btrfs"             # GRUB integration for Btrfs snapshots
+    "btrfs-progs"            # Btrfs filesystem utilities
+    # Add new filesystem tools here:
+)
+
+# Custom packages (add your personal package choices here)
+CUSTOM_PACKAGES=(
+)
+
+# Combine all packages into one array (modify this if you add new categories)
+ALL_PACKAGES=(
+    "${SYSTEM_PACKAGES[@]}"
+    "${GRAPHICS_PACKAGES[@]}"
+    "${HYPRLAND_PACKAGES[@]}"
+    "${UTILITY_PACKAGES[@]}"
+    "${APPLICATION_PACKAGES[@]}"
+    "${BLUETOOTH_PACKAGES[@]}"
+    "${FILESYSTEM_PACKAGES[@]}"
+    "${DEVELOPMENT_PACKAGES[@]}"
+    "${CUSTOM_PACKAGES[@]}"
+)
+
+# =============================================================================
+# Easy Management Tips:
+# =============================================================================
+# 1. To add a new package:
+#    - Find the appropriate category above
+#    - Add package name with a comment explaining its purpose
+#    - If creating a new category, remember to add it to ALL_PACKAGES array
+#
+# 2. To remove a package:
+#    - Comment out the line with #
+#    - Or delete the line entirely
+#
+# 3. To check if a package exists:
+#    - Run: xbps-query -Rs package-name
+#
+# 4. Changes take effect on next run of install.sh
+#
+# 5. Package naming tips:
+#    - Use exact package names from xbps-query
+#    - Check available packages: xbps-query -Rs search-term
+# =============================================================================#
