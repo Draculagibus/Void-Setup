@@ -38,7 +38,13 @@ EOF
     
     sudo chmod +x "/etc/sv/agetty-autologin-tty1/run"
     
-    # Enable the service
+    # DON'T enable the service yet - will be enabled after reboot prompt
+    info "Autologin service created (will be enabled on reboot)"
+}
+
+enable_autologin_service() {
+    log "Enabling autologin service..."
+    
     if [[ ! -e "/var/service/agetty-autologin-tty1" ]]; then
         sudo ln -s "/etc/sv/agetty-autologin-tty1" "/var/service/"
         log "Autologin service enabled"
