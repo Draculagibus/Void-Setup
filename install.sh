@@ -8,6 +8,9 @@
 
 set -euo pipefail  # Exit on error, undefined vars, and pipe failures
 
+# Set safety flag to prevent Hyprland from launching during script execution
+export VOID_SETUP_RUNNING=1
+
 # =============================================================================
 # Configuration and Constants
 # =============================================================================
