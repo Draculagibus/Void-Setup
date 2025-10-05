@@ -41,14 +41,17 @@ setup_bash_aliases() {
         return 0
     fi
     
-    # Add source line to .bashrc
+    # CRITICAL: Only add the aliases.sh source, NOT the install script
+    # Make absolutely sure we're only sourcing aliases.sh
     cat >> "$bashrc" <<EOF
 
 # Smart package management aliases for Void Setup
+# This only loads aliases, NOT the installation script
 if [ -f "$SCRIPT_DIR/aliases.sh" ]; then
     source "$SCRIPT_DIR/aliases.sh"
 fi
 EOF
     
     log "Bash aliases configured in $bashrc"
+    warn "IMPORTANT: Only aliases.sh is sourced, not install.sh"
 }
