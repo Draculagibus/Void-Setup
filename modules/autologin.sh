@@ -20,7 +20,11 @@ setup_autologin() {
     # Configure bash to launch Hyprland
     configure_hyprland_startup "$username"
     
+    # Create oneshot service to enable autologin on next boot
+    create_autologin_enabler
+    
     log "Autologin setup completed"
+    info "Autologin will be activated automatically on next reboot"
 }
 
 create_autologin_service() {
@@ -38,19 +42,50 @@ EOF
     
     sudo chmod +x "/etc/sv/agetty-autologin-tty1/run"
     
-    # DON'T enable the service yet - will be enabled after reboot prompt
-    info "Autologin service created (will be enabled on reboot)"
+    info "Autologin service created (not enabled yet)"
 }
 
-enable_autologin_service() {
-    log "Enabling autologin service..."
+create_autologin_enabler() {
+    log "Creating one-time autologin enabler service..."
     
-    if [[ ! -e "/var/service/agetty-autologin-tty1" ]]; then
-        sudo ln -s "/etc/sv/agetty-autologin-tty1" "/var/service/"
-        log "Autologin service enabled"
-    else
-        info "Autologin service already active"
-    fi
+    # Create a oneshot service that runs once on boot
+    sudo mkdir -p "/etc/sv/autologin-enabler"
+    
+    sudo tee "/etc/sv/autologin-enabler/run" > /dev/null <<'EOF'
+#!/bin/sh
+# One-time service to enable autologin after reboot
+
+# Remove default getty on tty1
+if [ -L "/var/service/agetty-tty1" ]; then
+    rm -f /var/service/agetty-tty1
+fi
+
+# Enable autologin
+if [ ! -L "/var/service/agetty-autologin-tty1" ]; then
+    ln -s /etc/sv/agetty-autologin-tty1 /var/service/
+fi
+
+# Remove this oneshot service so it doesn't run again
+rm -f /var/service/autologin-enabler
+
+# Exit successfully
+exit 0
+EOF
+    
+    sudo chmod +x "/etc/sv/autologin-enabler/run"
+    
+    # Create a finish script to mark as oneshot
+    sudo tee "/etc/sv/autologin-enabler/finish" > /dev/null <<'EOF'
+#!/bin/sh
+exec chpst -b autologin-enabler sleep 1
+EOF
+    
+    sudo chmod +x "/etc/sv/autologin-enabler/finish"
+    
+    # Enable the oneshot service
+    sudo ln -sf /etc/sv/autologin-enabler /var/service/
+    
+    log "Autologin enabler service created - will activate on next boot"
 }
 
 configure_hyprland_startup() {
