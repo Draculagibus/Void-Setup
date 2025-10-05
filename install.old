@@ -1,72 +1,256 @@
 #!/bin/bash
-# =============================================================================
-# Autologin Setup Module
-# =============================================================================
-# Configures automatic login and Hyprland startup
+set -e
 
-setup_autologin() {
-    log "Setting up autologin and Hyprland startup..."
-    
-    local username
-    username=$(logname 2>/dev/null || echo "$USER")
-    
-    if [[ -z "$username" ]]; then
-        error "Unable to determine username for autologin setup"
-    fi
-    
-    # Create autologin service
-    create_autologin_service "$username"
-    
-    # Configure bash to launch Hyprland
-    configure_hyprland_startup "$username"
-    
-    log "Autologin setup completed"
-}
+echo "Add custom repository..."
+echo repository=https://raw.githubusercontent.com/Makrennel/hyprland-void/repository-x86_64-glibc | sudo tee /etc/xbps.d/hyprland-void.conf
+sudo xbps-install -S
+echo "Custom repository added successfully!"
 
-create_autologin_service() {
-    local username="$1"
-    
-    log "Creating autologin service for $username on TTY1..."
-    
-    # Create runit service for autologin
-    sudo mkdir -p "/etc/sv/agetty-autologin-tty1"
-    
-    sudo tee "/etc/sv/agetty-autologin-tty1/run" > /dev/null <<EOF
+echo "Allow restricted packages..."
+# Check if the directory already exists
+if [ -d "$HOME/void-packages" ]; then
+    echo "Repository already cloned at ~/void-packages"
+else
+    git clone https://github.com/void-linux/void-packages.git ~/void-packages
+    echo "Cloned void-packages repository"
+fi
+grep -qxF 'XBPS_ALLOW_RESTRICTED=yes' ~/void-packages/etc/conf || echo 'XBPS_ALLOW_RESTRICTED=yes' >> ~/void-packages/etc/conf
+echo "Allowed restricted packages successfully"
+
+echo "Expand the repos..."
+  sudo xbps-install -Sy void-repo-multilib # Add multilib repos 
+  sudo xbps-install -Sy void-repo-nonfree  # Add nonfree repos
+echo "repos extended successfully"
+
+echo "Installing packages..."
+packages=(
+  ntp                # time sync
+  dbus               # session bus
+  seatd              # seat management
+  dumb_runtime_dir   # XDG_RUNTIME_DIR handler
+  mesa-dri           # OpenGL support
+  mesa-dri-32bit     # OpenGL support
+  mesa-vulkan-radeon # Vulkan support
+  mesa-vaapi         # Video acceleration
+  mesa-vdpau         # Video acceleration
+  wget               # Download stuff on the web
+  unzip              # Manage zip files
+  pipewire           # Sound management
+  pavucontrol        # Volume control
+  bluez              # Bluetooth management
+  xdg-desktop-portal-hyprland # Window Manager
+  hyprland           # Window Manager
+  hyprpaper          # Wallpaper Manager
+  hyprlock           # LockScreen Manager
+  hyprland-qtutils   # Qt/QML utility for Hyprland
+  quickshell         # Desktop shell toolkit
+  wl-clipboard       # To copy screenshots to clipboard
+  cliphist           # Manage clipboard & Screenshot
+  grim               # Takes screenshots of the screen or regions
+  slurp              # Select a region with your mouse
+  dolphin            # File explorer
+  kitty              # Terminal
+  fish-shell         # Shell
+  micro              # Text editor
+  starship           # Prompt customizer
+  firefox            # Browser
+  steam              # Game launcher
+  swww               # Wallpaper
+  grub-btrfs         # Manage BTRFS snapshots from GRUB
+  btrfs-progs        # BTRFS Commands
+  jq                 # Dependencie for Hyprshot
+  libnotify          # Dependencie for Hyprshot
+  stow               # Manage Symlink for Dotfiles
+)
+to_install=()
+for pkg in "${packages[@]}"; do
+  if xbps-query -l | grep -qw "$pkg"; then
+    echo "$pkg is already installed"
+  else
+    to_install+=("$pkg")
+  fi
+done
+
+if [ ${#to_install[@]} -gt 0 ]; then
+  echo "Installing missing packages: ${to_install[*]}"
+  sudo xbps-install -Sy "${to_install[@]}"
+else
+  echo "All packages are already installed"
+fi
+
+echo "Packages installed successfully!"
+
+echo "Installing restricted packages..."
+restricted_packages=(
+  discord                # Chat / Vocal servers
+)
+for pkg in "${restricted_packages[@]}"; do
+  if ls ~/void-packages/hostdir/binpkgs | grep -q "^${pkg}-"; then
+    echo "$pkg already built"
+  else
+    ~/void-packages/xbps-src binary-bootstrap
+    ~/void-packages/xbps-src pkg "$pkg"
+  fi
+done
+echo "Restricted packages installed successfully!"
+
+echo "Installing some packages manually"
+if [ -d "Hyprshot" ]; then
+    echo "Directory Hyprshot already exists. Skipping git clone."
+else
+    echo "Cloning repository into Hyprshot..."
+    git clone https://github.com/Gustash/hyprshot.git Hyprshot
+fi
+chmod +x Hyprshot/hyprshot
+sudo rm -rf /usr/local/bin/hyprshot
+sudo mv -f Hyprshot/hyprshot /usr/local/bin
+rm -rf Hyprshot
+echo "Packages installed..."
+
+echo "Configuring PipeWire..."
+WIREPLUMBER_CONF="/etc/pipewire/pipewire.conf.d/10-wireplumber.conf"
+if [ -L "$WIREPLUMBER_CONF" ]; then
+  echo "WirePlumber config already linked"
+else
+  sudo mkdir -p /etc/pipewire/pipewire.conf.d
+  sudo ln -s /usr/share/examples/wireplumber/10-wireplumber.conf "$WIREPLUMBER_CONF"
+  echo "WirePlumber config linked"
+fi
+echo "PipeWire configuration Success!"
+
+echo "Starting services..."
+declare -A services=(
+  [dhcpcd]="Network configuration via DHCP"
+  [dbus]="Session and system message bus"
+  [seatd]="Seat management for Wayland compositors"
+  [ntpd]="Time synchronization daemon"
+  [pipewire]="Audio and video server"
+  [bluetoothd]="Bluetooth device management"
+  [sshd]="Secure shell server for remote access"
+  [acpid]="ACPI event daemon for power management"
+)
+
+for svc in "${!services[@]}"; do
+  if [ -L "/var/service/$svc" ]; then
+    echo "Service '$svc' already enabled — ${services[$svc]}"
+  else
+    sudo ln -s "/etc/sv/$svc" "/var/service/$svc"
+    echo "Enabled service '$svc' — ${services[$svc]}"
+  fi
+done
+echo "Services started successfully!"
+
+echo "Managing user rights..."
+groups_to_add=(_seatd audio video input wheel)
+for grp in "${groups_to_add[@]}"; do
+  if id -nG "$USER" | grep -qw "$grp"; then
+    echo "User '$USER' is already in group '$grp'"
+  else
+    sudo usermod -aG "$grp" "$USER"
+    echo "Added user '$USER' to group '$grp'"
+  fi
+done
+echo "User rights added!"
+
+echo "Install Bibata Cursor..."
+wget -nc https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz
+tar -xf Bibata-Modern-Classic.tar.xz
+mkdir -p ~/.icons/
+sudo rm -rf ~/.icons/Bibata-Modern-Classic/
+mv -f Bibata-Modern-Classic/ ~/.icons/
+rm Bibata-Modern-Classic.tar.xz
+echo "Bibata cursor installed successfully!"
+
+echo "Manage dotfiles with stow and git..."
+cd dotfiles/
+stow --target="$HOME" *
+cd ..
+echo "Dotfiles managed!"
+
+echo "Creating autologin service for $(logname) on TTY1..."
+
+# Create runit service for autologin
+sudo mkdir -p "/etc/sv/agetty-autologin-tty1"
+sudo tee "/etc/sv/agetty-autologin-tty1/run" > /dev/null <<EOF
 #!/bin/sh
-exec agetty --autologin $username --noclear tty1 38400 linux
+exec agetty --autologin $(logname) --noclear tty1 38400 linux
 EOF
-    
-    sudo chmod +x "/etc/sv/agetty-autologin-tty1/run"
-    
-    # Enable the service
-    if [[ ! -e "/var/service/agetty-autologin-tty1" ]]; then
-        sudo ln -s "/etc/sv/agetty-autologin-tty1" "/var/service/"
-        log "Autologin service enabled"
-    else
-        info "Autologin service already active"
-    fi
-}
+sudo chmod +x "/etc/sv/agetty-autologin-tty1/run"
 
-configure_hyprland_startup() {
-    local username="$1"
-    local bash_profile="/home/$username/.bash_profile"
-    
-    log "Configuring bash to launch Hyprland on TTY1..."
-    
-    # Ensure .bash_profile exists
-    touch "$bash_profile"
-    
-    # Add Hyprland exec block if not present
-    if ! grep -q "exec Hyprland" "$bash_profile"; then
-        cat <<'EOF' >> "$bash_profile"
+# Enable the service
+if [ ! -e "/var/service/agetty-autologin-tty1" ]; then
+    sudo ln -s "/etc/sv/agetty-autologin-tty1" "/var/service/"
+    echo "Autologin service enabled."
+else
+    echo "Autologin service already active."
+fi
+
+echo "Configuring bash to launch Hyprland on TTY1..."
+
+BASH_PROFILE="/home/$(logname)/.bash_profile"
+
+# Ensure .bash_profile exists
+touch "${BASH_PROFILE}"
+
+# Add Hyprland exec block if not present
+if ! grep -q "exec Hyprland" "${BASH_PROFILE}"; then
+    cat <<'EOF' >> "${BASH_PROFILE}"
 
 # Autostart Hyprland on tty1
 if [ "$(tty)" = "/dev/tty1" ]; then
     exec Hyprland
 fi
 EOF
-        log "Hyprland launch added to .bash_profile"
+    echo "Hyprland launch added to .bash_profile."
+else
+    echo "Hyprland launch already present in .bash_profile."
+fi
+
+read -p "Do you want to set up Git and SSH access? (y/n): " use_git
+if [[ "$use_git" =~ ^[Yy]$ ]]; then
+  key_path="$HOME/.ssh/id_ed25519"
+
+  if [ ! -f "$key_path" ]; then
+    read -p "No SSH key found. Generate one now? (y/n): " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+      read -p "Enter your email for the SSH key: " email
+      ssh-keygen -t ed25519 -C "$email" -f "$key_path" -N ""
+      eval "$(ssh-agent -s)"
+      ssh-add "$key_path"
+
+      # Copy public key to clipboard (Wayland-first)
+      if command -v wl-copy &>/dev/null; then
+        wl-copy < "$key_path.pub"
+        echo "Public key copied to clipboard (via wl-copy)"
+      elif command -v xclip &>/dev/null; then
+        xclip -selection clipboard < "$key_path.pub"
+        echo "Public key copied to clipboard (via xclip)"
+      elif command -v pbcopy &>/dev/null; then
+        pbcopy < "$key_path.pub"
+        echo "Public key copied to clipboard (via pbcopy)"
+      else
+        echo "Couldn't auto-copy. Here's your public key:"
+        cat "$key_path.pub"
+      fi
+
+      echo -e "\n Add this key to your GitHub or GitLab account:"
+      echo "GitHub: https://github.com/settings/keys"
+      echo "GitLab: https://gitlab.com/-/profile/keys"
     else
-        info "Hyprland launch already present in .bash_profile"
+      echo "SSH key generation skipped."
     fi
-}
+  else
+    echo "SSH key already exists at $key_path"
+  fi
+else
+  echo "Git setup skipped."
+fi
+
+
+echo "Setup complete. Reboot to test autologin and Hyprland boot."
+echo
+read -rp "Would you like to reboot now? [y/N] " answer
+case "$answer" in
+    [Yy]* ) echo "Rebooting..."; sudo reboot ;;
+    * ) echo "Reboot skipped." ;;
+esac
