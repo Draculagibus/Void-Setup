@@ -46,14 +46,12 @@ EOF
 }
 
 create_autologin_enabler() {
-    log "Creating one-time autologin enabler service..."
+    log "Creating autologin activation script for next boot..."
     
-    # Create a oneshot service that runs once on boot
-    sudo mkdir -p "/etc/sv/autologin-enabler"
-    
-    sudo tee "/etc/sv/autologin-enabler/run" > /dev/null <<'EOF'
+    # Create a simple shell script that will be run by rc.local on next boot
+    sudo tee "/usr/local/bin/enable-autologin.sh" > /dev/null <<'EOF'
 #!/bin/sh
-# One-time service to enable autologin after reboot
+# One-time script to enable autologin after installation
 
 # Remove default getty on tty1
 if [ -L "/var/service/agetty-tty1" ]; then
@@ -65,27 +63,30 @@ if [ ! -L "/var/service/agetty-autologin-tty1" ]; then
     ln -s /etc/sv/agetty-autologin-tty1 /var/service/
 fi
 
-# Remove this oneshot service so it doesn't run again
-rm -f /var/service/autologin-enabler
+# Remove this script and rc.local entry
+rm -f /usr/local/bin/enable-autologin.sh
+sed -i '/enable-autologin.sh/d' /etc/rc.local
 
-# Exit successfully
 exit 0
 EOF
     
-    sudo chmod +x "/etc/sv/autologin-enabler/run"
+    sudo chmod +x "/usr/local/bin/enable-autologin.sh"
     
-    # Create a finish script to mark as oneshot
-    sudo tee "/etc/sv/autologin-enabler/finish" > /dev/null <<'EOF'
+    # Add to rc.local to run on next boot
+    if [[ ! -f "/etc/rc.local" ]]; then
+        sudo tee "/etc/rc.local" > /dev/null <<'EOF'
 #!/bin/sh
-exec chpst -b autologin-enabler sleep 1
+# Local startup script
 EOF
+        sudo chmod +x "/etc/rc.local"
+    fi
     
-    sudo chmod +x "/etc/sv/autologin-enabler/finish"
+    # Add our script to rc.local if not already there
+    if ! sudo grep -q "enable-autologin.sh" /etc/rc.local; then
+        sudo sed -i '$i /usr/local/bin/enable-autologin.sh &' /etc/rc.local
+    fi
     
-    # Enable the oneshot service
-    sudo ln -sf /etc/sv/autologin-enabler /var/service/
-    
-    log "Autologin enabler service created - will activate on next boot"
+    log "Autologin will be activated automatically on next boot"
 }
 
 configure_hyprland_startup() {
