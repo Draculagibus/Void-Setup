@@ -140,10 +140,25 @@ main() {
     
     # Ask for reboot
     if ask_yes_no "Would you like to reboot now to test the setup?"; then
-        log "Rebooting system..."
+        log "Enabling autologin service and rebooting..."
+        
+        # Disable default getty on tty1 first
+        if [[ -L "/var/service/agetty-tty1" ]]; then
+            sudo rm /var/service/agetty-tty1
+        fi
+        
+        # Enable autologin service
+        source "$SCRIPT_DIR/modules/autologin.sh"
+        enable_autologin_service
+        
+        # Immediate reboot so service doesn't interrupt anything
         sudo reboot
     else
-        info "Reboot skipped. Please reboot manually to test autologin and Hyprland."
+        info "Reboot skipped."
+        warn "To enable autologin manually later:"
+        echo "  sudo rm /var/service/agetty-tty1  # Remove default getty"
+        echo "  sudo ln -s /etc/sv/agetty-autologin-tty1 /var/service/"
+        echo "  sudo reboot"
     fi
 }
 
