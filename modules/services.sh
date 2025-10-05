@@ -43,8 +43,6 @@ enable_service() {
         log "Enabling service '$service' — $description"
         if sudo ln -s "$service_dir" "$service_link"; then
             log "Successfully enabled service '$service'"
-            # Give service time to start
-            sleep 1
         else
             warn "Failed to enable service '$service'"
         fi
@@ -76,21 +74,5 @@ add_user_to_group() {
         else
             warn "Failed to add user '$user' to group '$group'"
         fi
-    fi
-}
-
-# Function to check service status (useful for debugging)
-check_service_status() {
-    local service="$1"
-    local service_link="/var/service/$service"
-    
-    if [[ -L "$service_link" ]]; then
-        if sv status "$service" &>/dev/null; then
-            info "Service '$service' is running"
-        else
-            warn "Service '$service' is enabled but not running"
-        fi
-    else
-        info "Service '$service' is not enabled"
     fi
 }
