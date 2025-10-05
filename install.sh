@@ -14,6 +14,7 @@ set -euo pipefail  # Exit on error, undefined vars, and pipe failures
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly CONFIG_DIR="$SCRIPT_DIR/config"
+readonly MODULES_DIR="$SCRIPT_DIR/modules"
 readonly LOG_FILE="$SCRIPT_DIR/install.log"
 
 # Colors for output
@@ -72,6 +73,11 @@ validate_config_files() {
             error "Required config file not found: $file"
         fi
     done
+    
+    # Check if aliases.sh exists
+    if [[ ! -f "$SCRIPT_DIR/aliases.sh" ]]; then
+        error "Required file not found: $SCRIPT_DIR/aliases.sh"
+    fi
 }
 
 # =============================================================================
@@ -80,24 +86,23 @@ validate_config_files() {
 
 source_modules() {
     local modules=(
-        "modules/repositories.sh"
-        "modules/packages.sh"
-        "modules/restricted-packages.sh"
-        "modules/services.sh"
-        "modules/user-setup.sh"
-        "modules/dotfiles.sh"
-        "modules/autologin.sh"
-        "modules/git-setup.sh"
-        "modules/smart-aliases.sh"
+        "$MODULES_DIR/repositories.sh"
+        "$MODULES_DIR/packages.sh"
+        "$MODULES_DIR/restricted-packages.sh"
+        "$MODULES_DIR/services.sh"
+        "$MODULES_DIR/user-setup.sh"
+        "$MODULES_DIR/dotfiles.sh"
+        "$MODULES_DIR/autologin.sh"
+        "$MODULES_DIR/git-setup.sh"
+        "$MODULES_DIR/smart-aliases.sh"
     )
     
     for module in "${modules[@]}"; do
-        local module_path="$SCRIPT_DIR/$module"
-        if [[ -f "$module_path" ]]; then
+        if [[ -f "$module" ]]; then
             # shellcheck source=/dev/null
-            source "$module_path"
+            source "$module"
         else
-            error "Module not found: $module_path"
+            error "Module not found: $module"
         fi
     done
 }
@@ -139,26 +144,14 @@ main() {
     log "Setup complete! 🎉"
     
     # Ask for reboot
-    if ask_yes_no "Would you like to reboot now to test the setup?"; then
-        log "Enabling autologin service and rebooting..."
-        
-        # Disable default getty on tty1 first
-        if [[ -L "/var/service/agetty-tty1" ]]; then
-            sudo rm /var/service/agetty-tty1
-        fi
-        
-        # Enable autologin service
-        source "$SCRIPT_DIR/modules/autologin.sh"
-        enable_autologin_service
-        
-        # Immediate reboot so service doesn't interrupt anything
+    if ask_yes_no "Would you like to reboot now?"; then
+        log "Rebooting system..."
+        info "Autologin will be activated automatically after reboot"
         sudo reboot
     else
         info "Reboot skipped."
-        warn "To enable autologin manually later:"
-        echo "  sudo rm /var/service/agetty-tty1  # Remove default getty"
-        echo "  sudo ln -s /etc/sv/agetty-autologin-tty1 /var/service/"
-        echo "  sudo reboot"
+        warn "Autologin will be activated on your next reboot"
+        info "To reboot later: sudo reboot"
     fi
 }
 
