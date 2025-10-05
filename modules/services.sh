@@ -31,14 +31,23 @@ enable_service() {
     local service_link="/var/service/$service"
     local service_dir="/etc/sv/$service"
     
+    # Check if service directory exists first
+    if [[ ! -d "$service_dir" ]]; then
+        warn "Service directory not found for '$service' at $service_dir - skipping"
+        return 1
+    fi
+    
     if [[ -L "$service_link" ]]; then
         info "Service '$service' already enabled — $description"
-    elif [[ -d "$service_dir" ]]; then
-        log "Enabling service '$service' — $description"
-        sudo ln -s "$service_dir" "$service_link"
-        log "Successfully enabled service '$service'"
     else
-        warn "Service directory not found for '$service' at $service_dir"
+        log "Enabling service '$service' — $description"
+        if sudo ln -s "$service_dir" "$service_link"; then
+            log "Successfully enabled service '$service'"
+            # Give service time to start
+            sleep 1
+        else
+            warn "Failed to enable service '$service'"
+        fi
     fi
 }
 
