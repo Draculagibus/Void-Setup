@@ -142,16 +142,21 @@ main() {
     fi
     
     log "Setup complete! 🎉"
+    echo
+    info "To enable autologin and start Hyprland automatically:"
+    echo "  1. Reboot your system: sudo reboot"
+    echo "  2. After reboot, enable autologin:"
+    echo "     sudo rm /var/service/agetty-tty1"
+    echo "     sudo ln -s /etc/sv/agetty-autologin-tty1 /var/service/"
+    echo "  3. Reboot again to test autologin"
+    echo
     
     # Ask for reboot
     if ask_yes_no "Would you like to reboot now?"; then
         log "Rebooting system..."
-        info "Autologin will be activated automatically after reboot"
         sudo reboot
     else
-        info "Reboot skipped."
-        warn "Autologin will be activated on your next reboot"
-        info "To reboot later: sudo reboot"
+        info "Setup complete. Reboot when ready."
     fi
 }
 
