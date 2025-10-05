@@ -11,18 +11,21 @@ setup_smart_aliases() {
     local user_home
     user_home=$(eval echo "~$username")
     
-    # Setup for different shells
-    setup_bash_aliases "$user_home"
-    setup_fish_aliases "$user_home"
+    # Verify aliases.sh exists
+    if [[ ! -f "$SCRIPT_DIR/aliases.sh" ]]; then
+        error "aliases.sh not found at $SCRIPT_DIR/aliases.sh"
+    fi
     
     # Make aliases.sh executable
     chmod +x "$SCRIPT_DIR/aliases.sh"
     
+    # Setup for different shells
+    setup_bash_aliases "$user_home"
+    setup_fish_aliases "$user_home"
+    
     log "Smart aliases setup completed"
-    info "Available commands after restart:"
-    info "  xbps-smart-install, xbps-smart-remove, xbps-smart-service"
-    info "  xbps-smart-group, xbps-smart-repo, xbps-smart-restricted"
-    info "Type 'xbps-smart-help' for more information"
+    info "Aliases will be available after you restart your shell or run:"
+    info "  source $SCRIPT_DIR/aliases.sh"
 }
 
 setup_bash_aliases() {
