@@ -43,7 +43,7 @@ setup_bash_aliases() {
         return 0
     fi
     
-    # Add source line to .bashrc
+    # Add source line to .bashrc (NOT .bash_profile!)
     cat >> "$bashrc" <<EOF
 
 # Smart package management aliases for Void Setup
